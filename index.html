@@ -1,0 +1,451 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <script>
+        function profile() {
+            num = getcookie("playernum");
+            if (num < 5)
+                document.getElementById("profilewrap").style.height = num * 7 + "vh";
+            else if (num > 5)
+                document.getElementById("profilewrap").style.overflowY = "scroll";
+            for (var i = document.getElementById("profilewrap").childElementCount + 1; i <= num; i++) {
+                prof = document.createElement("div");
+                prof.innerHTML = getcookie("player" + i);
+                prof.setAttribute("id", i + "");
+                document.getElementById("profilewrap").appendChild(prof);
+                document.getElementById(i + "").addEventListener("mouseover", function () { document.getElementById(event.target.id).style.backgroundColor = "rgb(255, 0, 0)"; });
+                document.getElementById(i + "").addEventListener("mouseleave", function () {
+                    if (event.target.id==getcookie("currentplayer"))
+                        document.getElementById(event.target.id).style.backgroundColor = "rgb(14, 172, 46)";
+                    else
+                        document.getElementById(event.target.id).style.backgroundColor = "rgb(216, 211, 211)";
+
+                });
+            }
+        }
+        function createprof() {
+            if (document.getElementById("newprof").value!=""&&newprofile(document.getElementById("newprof").value)) {
+            profile();
+            document.getElementById(getcookie("currentplayer")).style.backgroundColor = "rgb(216, 211, 211)";
+            setCookie("currentplayer", getcookie("playernum"), 1000);
+                document.getElementById(getcookie("currentplayer")).style.backgroundColor = "rgb(14, 172, 46)";
+            }
+            document.getElementById("newprof").value = "";
+        }
+        function newprofile(name) {
+            num = getcookie("playernum");
+            if (num == "")
+                num = 0;
+            for (var i = 1; i <= num; i++) {
+                if (getcookie("player" + i) == name)
+                    return 0;
+            }
+            num++;
+            setCookie("playernum", num, 1000);
+            setCookie("player" + num, name, 1000);
+            return 1;
+        }
+        function setCookie(cname, cvalue, exdays) {
+            var d = new Date();
+            d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+            var expires = "expires=" + d.toUTCString();
+            document.cookie = cname + "=" + cvalue + "; " + expires;
+        }
+
+        function getcookie(cname) {
+            var name = cname + "=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+        function fun() {
+
+            ad = document.getElementsByTagName("input")[0].value;
+            if (ad!="") {
+                newprofile(ad);
+                profile();
+                document.getElementById("welcome").style.display = "none";
+                setCookie("currentplayer", "1", 1000);
+                setCookie("playernum", 1, 1000);
+                document.getElementById("1").style.backgroundColor = "rgb(14, 172, 46)";
+                messageAsToTime();
+            }
+
+        }
+       function messageAsToTime(){}
+        function d() {
+            if (getcookie("playernum") == "") document.getElementById("welcome").style.display = "block";
+            else {
+                profile();
+                document.getElementById(getcookie("currentplayer")).style.backgroundColor = "rgb(14, 172, 46)";
+                messageAsToTime();
+            }
+                document.getElementById("profilewrap").addEventListener("click", function () {
+                    document.getElementById(getcookie("currentplayer")).style.backgroundColor = "rgb(216, 211, 211)";
+                    setCookie("currentplayer",event.target.id, 1000);
+                    document.getElementById(getcookie("currentplayer")).style.backgroundColor = "rgb(14, 172, 46)";
+                    document.getElementById("rating").innerHTML = "";
+
+                });
+
+        }
+        function brainRating() {
+           var rate = Math.floor(getcookie("brainrating" + getcookie("currentplayer"))*1);
+            if (rate == "")
+                rate = 0;
+            document.getElementById("rating").innerHTML = rate + ":דרוג המוח שלך" +" "+ getcookie("player"+getcookie("currentplayer"))+" " +" הינו" +"<br\>" +"!ככל שתשחק יותר תגדיל את דרוג המוח שלך";
+
+        }
+    </script>
+    <style>
+        body {
+            position:relative;
+            width:100vw;
+            overflow-x:hidden;
+            height:100vh;
+        }
+
+        nav {
+            position: relative;
+            width: 60vw;
+            height: 8vh;
+            top: 0%;
+            left: 3%;
+            background-color: rgb(128,128,128);
+            box-shadow: 0px 3px 10px 0 rgb(34, 30, 30);
+        }
+
+            nav button {
+                margin: 0;
+                padding: 0;
+                position: relative;
+                width: 100%;
+                height: 100%;
+                border: hidden;
+                enable-background: inherit;
+                background-color: rgb(128,128,128);
+                font-size: 2vw;
+                font-family: Arial;
+                color: black;
+            }
+
+            nav a {
+                position: relative;
+                display: block;
+                float: left;
+                width: 33.3%;
+                height: 100%;
+                margin: 0;
+            }
+
+            nav div button {
+                width: 100%;
+            }
+
+            nav button:hover, #profile:hover button {
+                background-color: rgba(96, 87, 87,0.5);
+                color: aliceblue;
+            }
+
+        #dr {
+            display: block;
+            position: absolute;
+            left: 73%;
+            height: 37vh;
+            width: 16vw;
+            top: -5%;
+            z-index: 1;
+            transform: rotate(8deg);
+        }
+
+        #profile {
+            width: 33.33%;
+            height: 100%;
+            float: left;
+        }
+
+        #profilewrap {
+            position: absolute;
+            width: 20%;
+            display: none;
+            z-index: 1;
+            height: 35vh;
+            overflow: hidden;
+            text-align:center;
+            font-size:1.4vw;
+           
+        }
+        #profile:hover div {
+            display: block;
+        }
+
+        nav div div div {
+            width: 100%;
+            position: relative;
+            height: 7vh;
+            width: 100%;
+            background-color: rgb(216, 211, 211);
+        }
+
+            nav div div div:hover {
+                background-color: rgb(255, 0, 0);
+            }
+
+        #welcome {
+            top:0;
+            position: absolute;
+            height: 131.5%;
+            width: 100%;
+            background-color: rgba(0,0,0,0.75);
+            margin: 0;
+            z-index: 3;
+            display: none;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        #head {
+            position: relative;
+            height: 16vh;
+            width: 100vw;
+            margin: 0%;
+            padding: 0px;
+            top: 0%;
+            background-color: rgb(170, 30, 30);
+            text-align: center;
+            color: black;
+            font-family: Alfi Forte Century;
+            font-size: 4vh;
+            background-image: url('images/pzle.png');
+        }
+
+        h1 {
+            position: relative;
+            top: 15%;
+            height: 80%;
+            width: 100%;
+            margin: 0;
+        }
+
+        #new {
+            position: relative;
+            top: 20%;
+            text-align: center;
+            font-size: 4.5vh;
+            height:50%;
+        }
+
+        [type="text"] {
+            width: 60%;
+            display: inline-block;
+            position: relative;
+            height: 2.5vw;
+            top:10%;
+            font-size: 1.5vw;
+            z-index:2;
+        }
+
+        [type="button"] {
+            background-color: brown;
+            color: white;
+            border: none;
+            transition: width 0.5s height 0.5s;
+            height: 3vw;
+            width: 3vw;
+            font-size: 1.5vw;
+            top: 10%;
+            position:relative;
+        }
+
+            [type="button"]:hover {
+                box-shadow: rgba(0,0,0,0.8) 0px 0px 2px 0;
+                color: brown;
+                background-color: white;
+                border: thick black;
+            }
+
+        #newwrap {
+            position: relative;
+            height: 80vh;
+            width: 16%;
+            float: left;
+            top: 9%;
+            left: 5%;
+            background-color: lightgray;
+            box-shadow: 0 13px 15px 0 rgba(34, 30, 30,0.6);
+        }
+            section img {
+                display: block;
+                float:left;
+                position: relative;
+                top: 0;
+                left: -20%;
+                width: 30%;
+                height: 110%;
+            }
+        #newwrap img {
+            display: block;
+            position: relative;
+            top: 10%;
+            left: 2%;
+            width: 80%;
+            height: 30%;
+            left:10%;
+        }
+        span {
+            text-decoration: underline;
+            color: rgb(29, 22, 203);
+            cursor: pointer;
+        }
+
+        p {
+            position: relative;
+            text-align: center;
+            font-size: 4vh;
+            margin: 2%;
+           top:10%;
+           left:-10%;
+        }
+
+        footer {
+            width: 150vw;
+            position: relative;
+            height: 10vh;
+            margin: 0;
+            background-color: rgba(45, 35, 35,0.6);
+          top:15vh;
+        }
+
+            footer p {
+                margin: 0;
+                top: 30%;
+                left: -30%;
+            }
+
+            footer span {
+                text-decoration: none;
+            }
+
+        button span {
+            text-decoration: none;
+            color: inherit;
+        }
+        article{
+            position:relative;
+            height:80vh;
+            width:60%;
+          left:25%;
+          top:7%;
+          background-color:rgb(223, 220, 220);
+          margin:0;
+          box-shadow:0 13px 20px 0 rgba(34, 30, 30,0.6);
+        }
+            article section {
+                font-family: Arial;
+                text-align: left;
+                margin: 0;
+                height: 33%;
+                border-bottom: solid black;
+            }
+                article section::first-line{
+                    font-size:3vw;
+                }
+                section:last-child {
+                    text-align:center;
+                    border-bottom: none;
+                }
+                #welcome img{
+                    display:block;
+                    position:absolute;
+                    width:75%;
+                    height:80%;
+                    left:30%;
+                    top:10%;
+                }
+        #welcome>div {
+            position: relative;
+            float: left;
+            height: 70%;
+            width:40%;
+            background-color:white;
+            font-size:1.5vw;
+            top:15%;
+            left:25%;
+            border-radius:10px;
+            border:solid black;
+            text-align:center;
+        }
+        #welcome div div {
+            position: relative;
+            height: 70%;
+            width: 100%;
+            background-color: white;
+            font-size: 1.5vw;
+            top: 20%;
+            left: 0%;
+            text-align: center;
+        }
+        #rating{
+            font-size:1.7vw;
+        }
+    </style>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body onload="d()">
+    <div id="head"><h1>Brain Champ</h1></div>
+    <img id="dr" src="images/דר חכמוניפ.png" />
+    <!--<img id="dr" src="images/דר חכמוני1.png" />-->
+    <nav>
+        <div id="profile"><button><span>&#9662 </span>בחירת פרופיל</button><div id="profilewrap"></div></div>
+        <a href="about.html"><button>אודות</button></a>
+        <a href="singleexercise.html"><button>תרגול יחיד</button></a>
+    </nav>
+    <div id="welcome">
+        <div dir="rtl">
+            <div>
+                שלום קוראים לי דר' חכמוני ,<br />ואני אהיה מאמן המוח האישי שלכם
+                <br />אבל ראשון ראשון ואחרון אחרון <br />קודם תביא לי את שמך<br /> כדי שאוכל להכניס אותו לרשומות שלי!
+                <input type="text" onchange="fun()" />
+            </div>
+        </div>
+        <img src="images/דר22.png" />
+    </div>
+    <section id="newwrap">
+        <img src="images/Profile.png" />
+        <div id="new">
+            <label>יצירת פרופיל חדש</label>
+            <br /><input type="button" onclick="createprof()" value="צור">
+            <input id="newprof" type="text" />
+        </div>
+    </section>
+    <article>
+        <section>
+            <img src="images/מוח כתו.png" />
+            <p>לדרוג מוח לחץ <span onclick="brainRating()">כאן</span></p>
+            <p id="rating"></p>
+        </section>
+        <section>
+            תרגול יחיד <br /> 
+            בקישורית זו תמצאו משחקים לתרגול חלקי המוח השונים :ויזואלי,זיברון וכו
+        </section>
+        <section>אודות<br />
+            Brain Champ is the best way to keep your brain as fit it lets you practice all the parts of your brain in a very enjoyable way!<br />
+            <a href="about.html">להמשך קריאה &#8811 </a>
+        </section>
+    </article>
+
+ <footer><p>BrainChamp&#169; <span> www.brainchamp.co.il</span></p></footer>
+
+</body>
+</html>

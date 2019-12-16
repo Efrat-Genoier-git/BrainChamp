@@ -1,0 +1,542 @@
+﻿ד<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript">
+        var level, correct = 0, wrong = 0, round = 1, y, wid = 0,level1=4;
+        function StartGame() {
+            if (opener)
+                level1 = opener.document.getElementById("start").value;
+       
+            mytable = document.createElement("table");
+            for (i = 0; i < level1; i++) {
+                row = document.createElement("tr");
+                for (j = 0; j < level1; j++) {
+                    cell = document.createElement("td");
+                    row.appendChild(cell);
+                }
+                mytable.appendChild(row);
+            }
+            mytable.border = 0;
+
+            document.getElementById("tablewrapper").appendChild(mytable);
+            level = level1;
+            y = setInterval("increaseWidth()", 70);
+            Game();
+        }
+
+        var howManyToDraw = 1;
+        var help;
+        var allTd;
+        function Game() {
+            clearInterval(y);
+            allTd = document.querySelectorAll("td");
+            help = new Array(level * level);
+            for (i = 0; i < level * level; i++)
+                help[i] = 0;
+            for (i = 0; i < level * level; i++)
+                allTd[i].classList = "";
+            for (i = 0; i < howManyToDraw; i++)
+                while (help[Math.floor(Math.random() * (level * level))]++);
+            if (level == 4)
+                document.getElementById("round").innerHTML = "  מתחיל-";
+                else if (level == 5)
+                    document.getElementById("round").innerHTML = "  מומחה-";
+                else
+                    document.getElementById("round").innerHTML = " גאון -";
+            document.getElementById("round").innerHTML += ("    סיבוב    " + round );
+            
+            for (i = 0; i < level * level; i++)
+                if (help[i])
+                    allTd[i].classList = "checked";
+            clearInterval(y);
+            setTimeout("RemoveClass()", 2000);
+        }
+        function RemoveClass() {
+            allTd = document.querySelectorAll("td");
+            for (i = 0; i < level * level; i++)
+                if (allTd[i].classList.contains("checked"))
+                    allTd[i].classList.remove("checked");
+            document.getElementsByTagName("table")[0].onclick = AddClass;
+            y = setInterval("increaseWidth()",100);
+        }
+        flicker = 0; var x;
+        function Flicker() {
+            if (document.getElementById("xv").style.display == "block")
+                document.getElementById("xv").style.display = "none";
+            else
+                document.getElementById("xv").style.display = "block";
+            flicker++;
+            if (flicker == 5) {
+                clearInterval(x);
+                document.getElementById("x").style.display = "none";
+                document.getElementById("v").style.display = "none";
+                if (round < 3)
+                    howManyToDraw = Math.floor(Math.random() * (level - 2) + 2);
+                else if (round < 7)
+                    howManyToDraw = Math.floor(Math.random() * (level) + 6);
+                else
+                    howManyToDraw = Math.floor(Math.random() * (level * 2) + level * 2);
+                round++;
+
+
+                flicker = 0;
+                Game();
+            }
+        }
+
+        function PutMark(mark) {
+            document.getElementById("xv").style.display = "block";
+
+            if (!mark) {
+                document.getElementById("inx").play();
+                document.getElementById("x").style.display = "block";
+            }
+            else {
+                document.getElementById("inv").play();
+                document.getElementById("v").style.display = "block";
+            }
+            x = setInterval("Flicker()", 500);
+        }
+
+        function AddClass() {
+            var count = 0, count1 = 0;
+            if (event.target.tagName == "TD") {
+                document.getElementById("onpress").play();
+                event.target.classList.toggle("checked");
+            }
+            for (i = 0; i < level * level; i++)
+                if (allTd[i].classList.contains("checked"))
+                    count++;
+            if (count == howManyToDraw) {
+                document.getElementById("onpress").pause();
+                clearInterval(y);
+                for (i = 0; i < level * level; i++)
+                    if (allTd[i].classList.contains("checked") && help[i])
+                        count1++;
+                document.getElementsByTagName("table")[0].onclick = "";
+
+                if (count1 == howManyToDraw) {
+                    correct++;
+                    PutMark(1);
+
+                }
+                else {
+                    wrong++;
+                    PutMark(0);
+                }
+            }
+
+        }
+        var fill = 47.1; var points = 0,z;
+        function increaseWidth() {
+
+            document.getElementById("timer").style.width = wid + "%";
+            wid += 0.1666;
+            if (wid >= 100) {
+                document.getElementById("end").play();
+                document.getElementById("stopgame").style.display = "block";
+                setTimeout("bringbrain()", 2000);
+                clearInterval(y);
+            }
+        }
+        function bringbrain() {
+            document.getElementById("end").pause();
+            document.getElementById("brain").style.display = "block";
+            document.getElementById("correct").innerHTML = "  מספר תשובות נכונות: " + correct;
+            document.getElementById("wrong").innerHTML = "מס' תשובות לא נכונות: " + wrong;
+            level = level * 1;
+            switch(level)
+            {
+                case 4:
+                    points = correct * 120 - wrong * 70; break;
+                case 5:
+                    points = correct * 150 - wrong * 80; break;
+                    case 6:
+                        points = correct * 200 - wrong * 100; break;
+            }
+            howdel = getcookie("stillawake.html" + getcookie("currentplayer"));
+            if (howdel == "")
+                howdel = 0;
+            if (howdel < 3) {
+                if (howdel < 2 && points > 900)
+                    setcookie("stillawake.html" + getcookie("currentplayer"), 2, 1000);
+                else if (howdel < 3 && points > 900 && level1 == 5)
+                    setcookie("stillawake.html" + getcookie("currentplayer"), 3, 1000);
+            }
+            if (points < 0)
+                points = 0;
+            document.getElementById("points").innerHTML = points;
+            if (points > 1000) {
+                var curr = getcookie("currentplayer");
+                var brainr = getcookie("brainrating" + curr);
+                if (brainr == "")
+                    brainr = 0;
+                brainr *= 1;
+                setcookie("brainrating" + curr, brainr * 1 + (points / 2000 * ((level) * 1 - 3)), 1000);
+                points = 1000;
+            }
+            z=setInterval("fillbrain()", 10);
+
+        }
+        function fillbrain()
+        {
+            if (points / 10 * 0.328 < 47.1 - fill-0.329)
+                clearInterval(z);
+            else
+            document.getElementById("orange").style.clip = "rect(" + fill + "vh,70vh,70vh,0px)";
+            fill -= 0.328;
+        }
+        function setcookie(cname, cvalue, exdays) {
+            var d = new Date();
+            d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+            var expires = "expires=" + d.toUTCString();
+            document.cookie = cname + "=" + cvalue + "; " + expires;
+        }
+
+        function getcookie(cname) {
+            var name = cname + "=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+    </script>
+    <style>
+        .checked {
+            background-color: gold;
+        }
+
+        table {
+            position: absolute;
+            height: 50%;
+            width: 35%;
+            left: 32.5%;
+            top: 25%;
+            margin: 0px;
+        }
+
+        td {
+            border: groove;
+            border-color: slategrey;
+            background-color:darkblue;
+        }
+
+        #tablewrapper {
+            position: relative;
+            width: 98vw;
+            height: 98vh; 
+        }
+
+        #stopgame {
+            display: none;
+            background-color: rgba(128, 128, 128,0.5);
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0%;
+            z-index: 2;
+            top: 0%;
+           margin:0px;
+           padding:0px;
+        }
+
+        #xv {
+            display: none;
+            position: absolute;
+            left: 20%;
+            top: 10%;
+            height: 80%;
+            width: 60%;
+            background-color: transparent;
+
+        }
+
+        body {
+            position: relative;
+            padding:0px;
+            margin:0px;
+           
+        }
+
+        img {
+            display: none;
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
+
+        #timer {
+            overflow: hidden;
+            position: absolute;
+            height: 100%;
+            width: 0%;
+            top: 0%;
+            left: 0%;
+            margin: 0%;
+            padding: 0%;
+            background-color:forestgreen;
+        }
+
+        #timerwrap {
+            background-color: gainsboro;
+            border: solid;
+            border-color: black;
+            border-width: 2px;
+            position: absolute;
+            height: 10%;
+            width: 83.5%;
+            top: 85%;
+            left: 11.5%;
+            overflow:hidden;
+            border-radius:20px;
+        }
+
+        #fixtimer {
+            transform: rotate(-7deg);
+            display: block;
+            left: -11%;
+            position: absolute;
+            z-index: 2;
+            height: 260%;
+            width: 20%;
+            top: -60%;
+        }
+
+        @keyframes shake {
+            0% {
+                transform: rotate(-10deg);
+            }
+
+            25% {
+                transform: rotate(-25deg);
+            }
+
+            50% {
+                transform: rotate(-10deg);
+            }
+
+            75% {
+                transform: rotate(5deg);
+            }
+
+            100% {
+                transform: rotate(-10deg);
+            }
+        }
+
+        #clock {
+            animation: shake 0.2s infinite;
+            display: block;
+            position: absolute;
+            left: 35%;
+            top: 10%;
+            width: 30%;
+            height: 60%;
+        }
+        #stillAwake {
+            position: absolute;
+            height: 10%;
+            width: 100%;
+            margin: 0%;
+            padding: 0px;
+            top: 0%;
+            background-color: dimgrey;
+            text-align: center;
+            color: azure;
+            font-family: Alfi Forte Century;
+            font-size:4vh;
+        }
+        h1 {
+            margin: 0%;
+            padding: 0px;
+            top: 17%;
+            position: absolute;
+            height: 80%;
+            width: 100%;
+            font-family:Calibri;
+            font-size: 6vh;
+        }
+        #timerclock{
+            display:block;
+ position: absolute;
+            height: 15%;
+            width: 10%;
+            top: 83%;
+            left: 1%;
+            
+        }
+        #round {
+            position: absolute;
+            height: 8%;
+            width: 100%;
+            margin: 0%;
+            padding: 0px;
+            top: 12%;
+            background-color: gainsboro;
+            text-align: center;
+            color: dimgray;
+            font-family: Alfi Forte Century;
+            font-size: 6vh;
+        }
+        #brain{
+            display:none;
+            top:10%;
+            width:100%;
+            height:88%;
+            margin:0px;
+            position:absolute;
+            background-color:white;
+            z-index:3;
+        }
+        .picbrain {
+            display: block;
+            position: absolute;
+            top:7%;
+            left:30%;
+            height:80%;
+            width:40%;
+
+        }
+        #orange {
+            clip: rect(47.1vh,100vw,100vw,0px); /*47.1 לא צבוע*/
+        }
+        #answers{
+            position:absolute;
+            width:100%;
+            height:15%;
+            margin:0px;
+            top:73%;
+            background-color:rgb(190, 182, 182);
+          
+        }
+        p {
+            left: 42%;
+            position: absolute;
+            font-family: Alfi Forte Century;
+            font-size: 4vh;
+            color:dimgrey;
+            height:40%;
+            margin:0px;
+            padding:0px;
+        }
+        #correct{
+            top:4%;
+        }
+        #wrong {
+            top: 48%;
+            left:41.5%;
+        }
+        body{
+          height:100vh;
+          width:100vw;
+          position:absolute;
+          overflow:hidden;
+          margin:0px;
+        }
+        #points {
+            position: absolute;
+            font-size: 4vw;
+          top:35%;
+          left:47.5%;
+          z-index:4;
+          color:black;
+        }
+        #level {
+            position: absolute;
+            height: 100vh;
+            width: 100vw;
+            top: 0;
+            left: 0;
+            background-color: darkturquoise;
+            z-index: 5;
+            background-image: url('images/עדיין ער.PNG');
+           background-size:100% 100%;
+           background-repeat:no-repeat;
+        }
+        #level button{
+            position:relative;
+            background-color:rgb(133, 128, 128);
+            width:70%;
+            height:20%;
+            left:13%;
+            margin:2%;
+            margin-top:1%;
+            font-size:6vh;
+            color:black;
+            border:none;
+            display:block;
+            top:20%;
+        }
+
+            #level button:hover {
+                background-color: rgb(238, 11, 156);
+            }
+            #btwrap{
+                position:absolute;
+                height:60%;
+                width:40%;
+                top:20%;
+                left:30%;
+                background-color:rgba(128, 128, 128,0.6);
+            }
+            #start{
+                text-align:center;
+                font-size:6vh;
+                position:absolute;
+                top:0;
+                left:0;
+                width:100%;
+                height:15%;
+                background-color:rgb(62, 124, 238);
+                font-family:Calibri;
+            }
+    </style>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body onload="StartGame()">
+    <header id="stillAwake"><h1>?עדיין ער</h1></header>
+    <div id="round">
+
+    </div>
+    <div id="tablewrapper"></div>
+    <div id="stopgame">
+        <img id="clock" src="images/שעון.png" />
+    </div>
+    <div id="xv">
+        <img id="x" src="images/איקס.png" />
+
+        <img id="v" src="images/וי.png" />
+
+    </div>
+    <img id="timerclock" src="images/אין מילים תודה רבה! copy.png" />
+    <div id="timerwrap">
+        <div id="timer"></div>
+    </div>
+    <div id="brain">
+        <p id="points"></p>
+        <img class="picbrain" src="images/מח אפ.png" />
+        <img id="orange" class="picbrain" src="images/מוח כתו.png" />
+        <div id="answers"><p id="correct"></p><br /><p id="wrong"></p></div>
+    </div>
+    <audio id="inx">
+        <source src="sounds/BIG_ZAPP.WAV" />
+    </audio>
+    <audio id="inv">
+        <source src="sounds/DIGI_HAR.WAV" />
+    </audio>
+    <audio id="onpress">
+        <source src="sounds/LGBUBBLE.WAV"  />
+    </audio>
+    <audio id="end">
+        <source src="sounds/ALARM_BE.WAV"  />
+    </audio>
+</body>
+</html>

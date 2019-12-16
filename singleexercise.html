@@ -1,0 +1,252 @@
+﻿<!DOCTYPE html>
+<html>
+<head><script>
+    function allowchoose() {
+        document.body.onmouseenter= levelopen;
+       var ag= ["stillawake.html", "cityBloxx.html", "times.html"];
+        document.getElementById("games").onclick = choose;
+        for (var i = 0; i < 3; i++)
+            document.getElementById("games").children[i].value = ag[i];
+        document.getElementById("start").value = "4";
+        for (var i = 1; i < 4; i++)
+            document.getElementById("btwrap").children[i].onclick = passvalue;
+    }
+    function choose() {
+        if (event.target.tagName == "IMG" || event.target.tagName == "P") {
+            document.getElementById("btwrap").children[document.getElementById("start").value - 3].style.backgroundColor = "rgba(133, 128, 128,0.8)";
+            document.getElementById("game").value = event.target.parentElement.value;
+            document.getElementById("level").style.backgroundImage = "url(" + event.target.parentElement.children[1].src + ")";
+            document.getElementById("btwrap").style.display = "block";
+            document.getElementById("start").removeEventListener("click", opengame);
+            levelopen();
+        }
+    }
+    function levelopen() {
+        for (var i = 2; i < 4; i++)
+            document.getElementById("btwrap").children[i].style.textDecoration = "line-through";
+        delh = getcookie(document.getElementById("game").value + getcookie("currentplayer"));
+        if (delh == "")
+            delh = 0;
+        if (delh >= 2)
+            document.getElementById("btwrap").children[2].style.textDecoration = "none";
+        if (delh == 3)
+            document.getElementById("btwrap").children[3].style.textDecoration = "none";
+    }
+    function passvalue() {
+        if (event.target.style.textDecoration == "none" || event.target.style.textDecoration == "") {
+            document.getElementById("btwrap").children[document.getElementById("start").value - 3].style.backgroundColor = "rgba(133, 128, 128,0.8)";
+            event.target.style.backgroundColor = "rgb(42, 174, 59)";
+            document.getElementById("start").value = event.target.value;
+            document.getElementById("start").addEventListener("click", opengame);
+        }
+        else {
+            if (document.getElementById("start").value)
+                document.getElementById("btwrap").children[document.getElementById("start").value - 3].style.backgroundColor = "rgba(133, 128, 128,0.8)";
+            document.getElementById("start").removeEventListener("click", opengame);
+        }
+    }
+    function opengame() {
+        window.open(document.getElementById("game").value);
+    }
+    function getcookie(cname) {
+        var name = cname + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+    </script>
+    <style>
+     header{
+            position: absolute;
+            height: 15%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            top: 0%;
+            left:0%;
+            background-color:rgba(249, 9, 97,0.8);
+            text-align: center;
+            color: azure;
+            font-family: Alfi, Forte, Century;
+            font-size: 4vh;
+           box-shadow:rgba(0, 0, 0,0.6) 0px 0px 10px 0px inset;
+        }
+        h1 {
+            margin: 0%;
+            padding: 0px;
+            top: 20%;
+            position: absolute;
+            height: 80%;
+            width: 100%;
+            font-family: Calibri;
+            font-size: 6vh;
+        }
+        body{
+            width:100vw;
+            height:100vh;
+            overflow:hidden;
+            position:absolute;
+            margin:0;
+        }
+        #game{
+            position:absolute;
+            width:45%;
+            height:40%;
+            top:25%;
+            left:27.5%;
+          
+        }
+     hr{
+         position:absolute;
+         top:70%;
+         width:90%;
+         left:5%;
+     }
+     #games{
+         position:absolute;
+         top:73%;
+         left:0;
+         height:27%;
+         width:100%;
+     }
+    #games div{
+         position:relative;
+         display:block;
+         width:30%;
+         height:100%;
+         top:0;
+         float:left;
+         text-decoration:none;
+     }
+    div img{
+         top:5%;
+         display:block;
+         position:relative;
+         height:70%;
+         width:70%;
+         left:25%;
+     }
+        [value="cityBloxx.html"] img{
+            height:63%;
+            top:10%;
+        }
+        div p {
+            position: relative;
+            top: 0;
+            height: 10%;
+            margin: 0;
+            left: 55%;
+            font-family:Calibri;
+            color:black;
+            font-size:3vh;
+        }
+        #level {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 5;
+            background-image: url('images/paz.png');
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            
+        }
+
+            #level button {
+                position: relative;
+                background-color: rgba(133, 128, 128,0.8);
+                width: 70%;
+                height: 20%;
+                left: 13%;
+                margin: 2%;
+                margin-top: 1%;
+                font-size: 3vh;
+                color: black;
+                border: none;
+                display: block;
+                top: 25%;
+                box-shadow: rgba(0, 0, 0,0.6) 0px 0px 3px 0px inset;
+            }
+            #level button {
+                width: 60%;
+                left: 18%;
+                font-size: 3.5vh;
+            }
+                #btwrap {
+                    position: absolute;
+                    height: 60%;
+                    width: 30%;
+                    top: 28%;
+                    left: 35%;
+                    background-color: rgba(128, 128, 128,0.6);
+                    display: none;
+                }
+        #btwrap {
+            position: absolute;
+            height: 80%;
+            width: 40%;
+            top: 20%;
+            left: 30%;
+            background-color: rgba(0, 0, 0,0.7);
+            display: none;
+           
+        }
+
+        #start {
+            text-align: center;
+            font-size: 3.5vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 20%;
+            background-color: rgb(62, 124, 238);
+            font-family: Calibri;
+            box-shadow: rgba(0, 0, 0,0.6) 0px 0px 5px 0px inset;
+        }
+        #start {
+            font-size: 5vh;
+        }
+            #start:hover {
+                box-shadow: rgba(0, 0, 0,0.6) 0px 0px 10px 0px inset;
+                background-color: rgb(249, 100, 31);
+            }
+    </style>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body onload="allowchoose()">
+    <header id="stillAwake"><h1>תרגול יחיד</h1></header>
+    <div id="game"><div id="level">
+    <div id="btwrap">
+        <div id="start">התחל</div>
+        <button value="4">מתחיל</button>
+        <button value="5">מומחה</button>
+        <button value="6">גאון</button></div>
+</div></div>
+    <hr />
+    <div id="games">
+        <div>
+            <p>עדיין ער</p>
+            <img src="images/עדיין ער.PNG" />
+        </div>
+        <div>
+            <p>משחק מנוף</p>
+            <img src="images/משחק‏‏מנוף.PNG" />
+        </div>
+        <div>
+            <p>הפרש זמנים</p>
+            <img src="images/הפרש ז.PNG" />
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,491 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+    <title></title>
+    <script>
+
+        var one = 0, two = 0, correct = 0, wrong = 0, wid = 0, round = 1, y, level = 4, sub, r, z, w, f = 0,yyy=0;
+        var levelarr = ["מתחיל:", "מומחה", "גאון"];
+        function Start() {
+            if (opener)
+                level = opener.document.getElementById("start").value;
+            Game();
+        }
+        function Game() {
+            document.getElementById("round").innerHTML = levelarr[level - 4];
+            document.getElementById("round").innerHTML += ("    סיבוב    " + round);
+            y = setInterval("increaseWidth()", 50);
+
+            one = Math.ceil(Math.random() * 11);
+
+            if (level == 4)
+                sub = Math.ceil(Math.random() * 5);
+            else if (level == 5)
+                sub = Math.floor(Math.random() * 8);
+            else
+                sub = Math.ceil(Math.random() * 11);
+            w = setInterval(clockHand, 10);
+            two = (one + sub) % 12;
+            one *= 30;
+            two *= 30;
+            document.getElementsByTagName("body")[0].addEventListener("keypress", check);
+        }
+        function check() {
+            if (sub > 9 && f == 0) {
+                r = (event.keyCode - 48) + "";
+                f = 1;
+                ntsByTagName("body")[0].addEventListener("keypress", check);
+            }
+            else {
+                if (f == 1) {
+                    r += event.keyCode - 48;
+                    f = 0;
+                }
+                else
+                    r = event.keyCode - 48;
+            }
+            document.getElementsByTagName("body")[0].removeEventListener("keypress", check);
+            clearInterval(w);
+            clearInterval(y);
+            if (r == sub) {
+                correct++;
+                PutMark(1);
+            }
+            else {
+                wrong++;
+                PutMark(0);
+            }
+        }
+
+        function clockHand() {
+
+            if (level == 4) {
+                one += 0.225;
+                two += 0.225;
+            }
+            else if (level == 5) {
+                one += 0.45;
+                two += 0.45;
+            }
+            else {
+                one += 0.675;
+                two += 0.675;
+            }
+            document.getElementById("hand1").style.transform = "rotate(" + one + "deg)";
+            document.getElementById("hand2").style.transform = "rotate(" + two + "deg)";
+        }
+        function PutMark(mark) {
+            document.getElementById("xv").style.display = "block";
+
+            if (!mark) {
+                document.getElementById("inx").play();
+                document.getElementById("x").style.display = "block";
+            }
+            else {
+                document.getElementById("inv").play();
+                document.getElementById("v").style.display = "block";
+            }
+            x = setInterval("Flicker()", 500);
+        }
+
+        flicker = 0; var x;
+        function Flicker() {
+            if (document.getElementById("xv").style.display == "block")
+                document.getElementById("xv").style.display = "none";
+            else
+                document.getElementById("xv").style.display = "block";
+            flicker++;
+            if (flicker == 5) {
+                clearInterval(x);
+                document.getElementById("x").style.display = "none";
+                document.getElementById("v").style.display = "none";
+                round++;
+                flicker = 0;
+                Game();
+            }
+        }
+
+
+        var fill = 47.1; var points = 0, z;
+        function increaseWidth() {
+            document.getElementById("timer").style.width = wid + "%";
+            wid += 0.1666;
+            if (wid >= 100) {
+                document.getElementById("stopgame").style.display = "block";
+                document.body.removeEventListener("keypress", check);
+                document.getElementById("end").play();
+                setTimeout("bringbrain()", 2000);
+                clearInterval(y);
+            }
+        }
+        function bringbrain() {
+            document.getElementById("end").pause();
+            document.getElementById("stopgame").style.display = "none";
+            document.getElementById("brain").style.display = "block";
+            document.getElementById("correct").innerHTML = "  מספר תשובות נכונות: " + correct;
+            document.getElementById("wrong").innerHTML = "מס' תשובות לא נכונות: " + wrong;
+            points = correct * 120 - wrong * 50;
+            howdel = getcookie("times.html" + getcookie("currentplayer"));
+            if (howdel == "")
+                howdel = 0;
+            if (howdel < 3) {
+                if (howdel < 2 && points > 900)
+                    setcookie("times.html" + getcookie("currentplayer"), 2, 1000);
+                else if (howdel < 3 && points > 900 && level == 5)
+                    setcookie("times.html" + getcookie("currentplayer"), 3, 1000);
+            }
+            if (points < 0)
+                points = 0;
+            document.getElementById("points").innerHTML = points;
+            if (points > 1000) {
+                var curr = getcookie("currentplayer");
+                var brainr = getcookie("brainrating" +curr );
+                if (brainr == "")
+                    brainr = 0;
+                brainr *= 1;
+                setcookie("brainrating" + curr, brainr * 1 + (points / 2000 * ((level) * 1 - 3)), 1000);
+                points = 1000;
+            }
+            z = setInterval("fillbrain()", 10);
+
+        }
+        function fillbrain() {
+            if (points / 10 * 0.328 < 47.1 - fill - 0.329)
+                clearInterval(z);
+            else
+                document.getElementById("orange").style.clip = "rect(" + fill + "vh,1000vh,1000vh,0px)";
+            fill -= 0.328;
+        }
+        function setcookie(cname, cvalue, exdays) {
+            var d = new Date();
+            d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+            var expires = "expires=" + d.toUTCString();
+            document.cookie = cname + "=" + cvalue + "; " + expires;
+        }
+
+        function getcookie(cname) {
+            var name = cname + "=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+    </script>
+    <style>
+        #tablewrapper {
+            position: relative;
+            width: 98vw;
+            height: 98vh;
+        }
+
+        #stopgame {
+            display: none;
+            background-color: rgba(128, 128, 128,0.5);
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0%;
+            z-index: 2;
+            top: 0%;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        #xv {
+            display: none;
+            position: absolute;
+            left: 20%;
+            top: 10%;
+            height: 80%;
+            width: 60%;
+            background-color: transparent;
+            z-index: 5;
+        }
+
+        body {
+            position: relative;
+            padding: 0px;
+            margin: 0px;
+        }
+
+        #timer {
+            overflow: hidden;
+            position: absolute;
+            height: 100%;
+            width: 0%;
+            top: 0%;
+            left: 0%;
+            margin: 0%;
+            padding: 0%;
+            background-color: forestgreen;
+        }
+
+        #timerwrap {
+            background-color: gainsboro;
+            border: solid;
+            border-color: black;
+            border-width: 2px;
+            position: absolute;
+            height: 10%;
+            width: 83.5%;
+            top: 85%;
+            left: 11.5%;
+            overflow: hidden;
+            border-radius: 20px;
+        }
+
+        #fixtimer {
+            transform: rotate(-7deg);
+            display: block;
+            left: -11%;
+            position: absolute;
+            z-index: 2;
+            height: 260%;
+            width: 20%;
+            top: -60%;
+        }
+
+        @keyframes shake {
+            0% {
+                transform: rotate(-10deg);
+            }
+
+            25% {
+                transform: rotate(-25deg);
+            }
+
+            50% {
+                transform: rotate(-10deg);
+            }
+
+            75% {
+                transform: rotate(5deg);
+            }
+
+            100% {
+                transform: rotate(-10deg);
+            }
+        }
+
+        #clock {
+            animation: shake 0.2s infinite;
+            display: block;
+            position: absolute;
+            left: 35%;
+            top: 10%;
+            width: 30%;
+            height: 60%;
+        }
+
+        #timesSub {
+            position: absolute;
+            height: 10%;
+            width: 100%;
+            margin: 0%;
+            padding: 0px;
+            top: 0%;
+            background-color: dimgrey;
+            text-align: center;
+            color: azure;
+            font-family: Alfi Forte Century;
+            font-size: 4vh;
+        }
+
+        #answers {
+            position: absolute;
+            width: 100%;
+            height: 15%;
+            margin: 0px;
+            top: 73%;
+            background-color: rgb(190, 182, 182);
+        }
+
+        #correct {
+            top: 4%;
+        }
+
+        #wrong {
+            top: 48%;
+            left: 41.5%;
+        }
+
+        p {
+            left: 42%;
+            position: absolute;
+            font-family: Alfi Forte Century;
+            font-size: 4vh;
+            color: dimgrey;
+            height: 40%;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        h1 {
+            margin: 0%;
+            padding: 0px;
+            top: 17%;
+            position: absolute;
+            height: 80%;
+            width: 100%;
+            font-family: Calibri;
+            font-size: 6vh;
+        }
+
+        #timerclock {
+            display: block;
+            position: absolute;
+            height: 15%;
+            width: 8%;
+            top: 83%;
+            left: 2%;
+        }
+
+        #round {
+            position: absolute;
+            height: 8%;
+            width: 100%;
+            margin: 0%;
+            padding: 0px;
+            top: 12%;
+            background-color: gainsboro;
+            text-align: center;
+            color: dimgray;
+            font-family: Alfi Forte Century;
+            font-size: 6vh;
+        }
+
+        #brain {
+            display: none;
+            top: 10%;
+            width: 100%;
+            height: 88%;
+            margin: 0px;
+            position: absolute;
+            background-color: white;
+            z-index: 3;
+        }
+
+        .picbrain {
+            display: block;
+            position: absolute;
+            top: 7%;
+            left: 30%;
+            height: 80%;
+            width: 35%;
+        }
+
+        #orange {
+            clip: rect(47.1vh,1000vw,1000vw,0px); /*47.1 לא צבוע*/
+        }
+
+        #hand1 {
+            width: 0.15vw;
+            height: 30vh;
+            background-color: black;
+            position: absolute;
+            top: 30%;
+            left: 38.3%;
+            clip: rect(15vh,100vw,100vw,0px);
+            transform: rotate(0deg);
+            /*z-index: 3;*/
+        }
+
+        #hand2 {
+            width: 0.15vw;
+            height: 30vh;
+            background-color: black;
+            position: absolute;
+            top: 36%;
+            left: 59.3%;
+            clip: rect(15vh,100vw,100vw,0px);
+            transform: rotate(0deg);
+        }
+
+        #lightblue {
+            position: absolute;
+            top: 20%;
+            left: 24%;
+            height: 51%;
+            width: 32%;
+            background-color: transparent;
+        }
+
+        #blue {
+            position: absolute;
+            top: 30%;
+            left: 45%;
+            height: 45%;
+            width: 29%;
+            background-color: transparent;
+        }
+
+        #x, #v {
+            display: none;
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
+        #points {
+            position: absolute;
+            font-size: 4vw;
+            top: 35%;
+            left: 45%;
+            z-index: 4;
+            color: black;
+        }
+    </style>
+
+</head>
+<body onload="Start()">
+
+    <header id="timesSub">
+        <h1>הפרש זמנים</h1>
+    </header>
+    <div id="round"></div>
+    <div id="tablewrapper"></div>
+    <div id="stopgame">
+        <img id="clock" src="images/שעון.png" />
+    </div>
+    <div id="xv">
+        <img id="x" src="images/איקס.png" />
+        <img id="v" src="images/וי.png" />
+    </div>
+    <img id="timerclock" src="images/אין מילים תודה רבה! copy.png" />
+    <div id="timerwrap">
+        <div id="timer"></div>
+    </div>
+    <div id="brain">
+        <p id="points"></p>
+        <img class="picbrain" src="images/מח אפ.png" />
+        <img id="orange" class="picbrain" src="images/מוח כתו.png" />
+
+        <div id="answers">
+            <p id="correct"></p>
+            <br />
+            <p id="wrong"></p>
+        </div>
+
+    </div>
+    <img id="lightblue" src="images/שעוןiiii 1.png" />
+    <div id="hand1"></div>
+    <img id="blue" src="images/שעוןiii 2bbbbbbbbbbbbbbbbb.png" />
+    <div id="hand2"></div>
+    <audio id="inx">
+        <source src="sounds/BIG_ZAPP.WAV" />
+    </audio>
+    <audio id="inv">
+        <source src="sounds/DIGI_HAR.WAV" />
+    </audio>
+    <audio id="end">
+        <source src="sounds/ALARM_BE.WAV" />
+    </audio>
+</body>
+</html>
